@@ -1,12 +1,10 @@
 package com.example.eric.guitarheroes;
 
 
-import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,15 +13,12 @@ import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity implements SensorEventListener {
 
   private TextView mTextView;
-  MainActivity self = this;
   double xVal = 0.0;
   double yVal = 0.0;
   double zVal = 0.0;
@@ -37,10 +32,10 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     if(xReading < 50 && xVal == 400){
       UpListener ul = new UpListener();
-      ul.onClick(new View(self));
+      ul.onClick(new View(this));
     } else if(xReading > -50 && xVal == -400){
       DownListener dl = new DownListener();
-      dl.onLongClick(new View(self));
+      dl.onLongClick(new View(this));
     }
 
     xVal = xReading;
