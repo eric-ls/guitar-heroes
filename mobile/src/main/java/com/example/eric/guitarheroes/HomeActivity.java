@@ -48,12 +48,13 @@ public class HomeActivity extends AppCompatActivity {
       public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
         try {
           Log.d("HEROES", response.toString());
+          Song song = new Song(response.getString("body"));
         } catch (Exception e) {
           e.printStackTrace();
         }
       }
     };
-    guitarPartyClient.get("songs/5/", new RequestParams(), handler);
+    guitarPartyClient.get("songs/2/", new RequestParams(), handler);
   }
 
   @Override
