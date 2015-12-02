@@ -1,6 +1,7 @@
 package com.example.eric.guitarheroes;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -30,18 +32,16 @@ public class HomeActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.content_home);
-//    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//    setSupportActionBar(toolbar);
+    setContentView(R.layout.app_bar_home);
 
-//    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//    fab.setOnClickListener(new View.OnClickListener() {
-//      @Override
-//      public void onClick(View view) {
-//        Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).show();
-//      }
-//    });
+    ImageView homeImage = (ImageView) findViewById(R.id.homeImage);
+    homeImage.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+        // open up the song activity
+        Intent intent = new Intent(getBaseContext(), SongActivity.class);
+        startActivity(intent);
+      }
+    });
 
     AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
       @Override
