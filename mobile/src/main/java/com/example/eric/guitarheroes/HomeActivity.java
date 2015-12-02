@@ -25,12 +25,12 @@ import cz.msebera.android.httpclient.Header;
 
 public class HomeActivity extends AppCompatActivity {
 
-  public static GuitarPartyClient guitarPartyClient = new GuitarPartyClient();
+    public static GuitarPartyClient guitarPartyClient = new GuitarPartyClient();
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.content_home);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.content_home);
 //    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //    setSupportActionBar(toolbar);
 
@@ -43,38 +43,39 @@ public class HomeActivity extends AppCompatActivity {
 //      }
 //    });
 
-    AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
-      @Override
-      public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-        try {
-          Log.d("HEROES", response.toString());
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    };
-    guitarPartyClient.get("songs/5/", new RequestParams(), handler);
-  }
-
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    getMenuInflater().inflate(R.menu.menu_home, menu);
-    return true;
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    int id = item.getItemId();
-
-    //noinspection SimplifiableIfStatement
-    if (id == R.id.action_settings) {
-      return true;
+        AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    Log.d("HEROES", response.toString());
+                    Song song = new Song(response.getString("body"));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        guitarPartyClient.get("songs/3/", new RequestParams(), handler);
     }
 
-    return super.onOptionsItemSelected(item);
-  }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_home, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 }
