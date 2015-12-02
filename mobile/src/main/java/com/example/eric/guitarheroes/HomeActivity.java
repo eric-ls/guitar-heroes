@@ -27,8 +27,6 @@ import cz.msebera.android.httpclient.Header;
 
 public class HomeActivity extends AppCompatActivity {
 
-  public static GuitarPartyClient guitarPartyClient = new GuitarPartyClient();
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -42,19 +40,6 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
       }
     });
-
-    AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
-      @Override
-      public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-        try {
-          Log.d("HEROES", response.toString());
-          Song song = new Song(response.getString("body"));
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    };
-    guitarPartyClient.get("songs/2/", new RequestParams(), handler);
   }
 
   @Override
