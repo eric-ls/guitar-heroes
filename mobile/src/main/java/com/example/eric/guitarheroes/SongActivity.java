@@ -9,10 +9,18 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import cz.msebera.android.httpclient.Header;
+import pl.tajchert.buswear.EventBus;
+
+import org.json.JSONObject;
+
 public class SongActivity extends AppCompatActivity {
 
-  float x1 ,x2;
-  final int MIN_DISTANCE = 150;
+  public static GuitarPartyClient guitarPartyClient = new GuitarPartyClient();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -20,24 +28,24 @@ public class SongActivity extends AppCompatActivity {
     setContentView(R.layout.activity_song);
 
     ImageView image = (ImageView) findViewById(R.id.songImage);
-  }
-
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    switch(event.getAction()) {
-      case MotionEvent.ACTION_DOWN:
-        x1 = event.getX();
-        break;
-      case MotionEvent.ACTION_UP:
-        x2 = event.getX();
-        float deltaX = x2 - x1;
-        if (Math.abs(deltaX) > MIN_DISTANCE) {
-          finish();
-        } else {
-          // TODO: open up watch app here
-        }
-        break;
-    }
-    return super.onTouchEvent(event);
+    final Activity that = this;
+    image.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
+          @Override
+          public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+            try {
+              Log.d("HEROES", response.toString());
+              EventBus.getDefault().postRemote(response.toString(), that);     //Custom parcelable object
+              Song song = new Song(response.getString("body"));
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
+        };
+        guitarPartyClient.get("songs/2/", new RequestParams(), handler);
+      }
+    });
   }
 }
