@@ -36,7 +36,7 @@ public class HomeActivity extends AppCompatActivity {
     homeImage.setOnClickListener(new View.OnClickListener() {
       public void onClick(View v) {
         // open up the song activity
-        Intent intent = new Intent(getBaseContext(), SongActivity.class);
+        Intent intent = new Intent(getBaseContext(), SongListActivity.class);
         startActivity(intent);
       }
     });
