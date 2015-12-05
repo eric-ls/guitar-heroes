@@ -1,13 +1,10 @@
 package com.example.eric.guitarheroes;
 
-import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -27,8 +24,14 @@ import com.guitarheroes.song.Song;
 
 import org.json.JSONObject;
 
-public class SongActivity extends AppCompatActivity {
+import cz.msebera.android.httpclient.Header;
 
+public class SongActivity extends AppCompatActivity {
+  private static final String TAG = SongActivity.class.getName();
+  private static final String SONG_PATH = "/res/songs";
+  private static final String JSON_SONG_KEY = "song data";
+
+  private GoogleApiClient mGoogleApiClient;
   public static GuitarPartyClient guitarPartyClient = new GuitarPartyClient();
 
   @Override
@@ -36,39 +39,41 @@ public class SongActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_song);
 
-    final GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
+    mGoogleApiClient = new GoogleApiClient.Builder(this)
             .addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
               @Override
               public void onConnected(Bundle connectionHint) {
-                Log.d("HEROES", "onConnected: " + connectionHint);
-                // Now you can use the Data Layer API
+                Log.d(TAG, "onConnected: " + connectionHint);
               }
               @Override
               public void onConnectionSuspended(int cause) {
-                Log.d("HEROES", "onConnectionSuspended: " + cause);
+                Log.d(TAG, "onConnectionSuspended: " + cause);
               }
             })
             .addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
               @Override
               public void onConnectionFailed(ConnectionResult result) {
-                Log.d("HEROES", "onConnectionFailed: " + result);
+                Log.d(TAG, String.format("Failed. Error msg: %s. Error Code: %s.",
+                        result.getErrorMessage(),
+                        result.getErrorCode()));
               }
             })
-                    // Request access only to the Wearable API
             .addApi(Wearable.API)
             .build();
 
+    // Which image is this? The whole image? Or just open on song button?
     ImageView image = (ImageView) findViewById(R.id.songImage);
     image.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
+        // Get the song data
         AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
           @Override
           public void onSuccess(int statusCode, Header[] headers, final JSONObject response) {
             try {
-              Log.d("HEROES", response.toString());
-              PutDataMapRequest putDataMapReq = PutDataMapRequest.create("/count");
-              putDataMapReq.getDataMap().putString("DATA", response.toString());
+
+              PutDataMapRequest putDataMapReq = PutDataMapRequest.create(SONG_PATH);
+              putDataMapReq.getDataMap().putString(JSON_SONG_KEY, response.toString());
               PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
               PendingResult<DataApi.DataItemResult> pendingResult =
                       Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);

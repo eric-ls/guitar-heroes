@@ -1,7 +1,5 @@
 package com.example.eric.guitarheroes;
 
-import android.app.Activity;
-
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
@@ -17,24 +15,55 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.wearable.DataApi;
-import com.google.android.gms.wearable.DataEvent;
-import com.google.android.gms.wearable.DataEventBuffer;
-import com.google.android.gms.wearable.DataItem;
-import com.google.android.gms.wearable.DataMap;
-import com.google.android.gms.wearable.DataMapItem;
-import com.google.android.gms.wearable.Wearable;
 
 import com.guitarheroes.song.Song;
 
 public class MainActivity extends Activity implements SensorEventListener {
-
+  private GoogleApiClient mGoogleApiClient;
   private TextView mTextView;
+
   double xVal = 0.0;
   double yVal = 0.0;
   double zVal = 0.0;
+
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+
+    SensorManager sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+    Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+    sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+
+    final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
+    stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
+      @Override
+      public void onLayoutInflated(WatchViewStub stub) {
+        mTextView = (TextView) stub.findViewById(R.id.text);
+
+        RelativeLayout pic2 = (RelativeLayout) findViewById(R.id.pic2);
+        RelativeLayout pic1 = (RelativeLayout) findViewById(R.id.pic1);
+        WatchViewStub stub1 = (WatchViewStub)findViewById(R.id.watch_view_stub);
+
+        Log.d("onLayoutInflated", "width: " + stub1.getMeasuredWidth());
+        pic2.setX(stub1.getMeasuredWidth());
+
+
+        pic1.setOnClickListener(new UpListener());
+        pic2.setOnClickListener(new UpListener());
+
+        pic1.setOnLongClickListener(new DownListener());
+        pic2.setOnLongClickListener(new DownListener());
+
+      }
+    });
+  }
+
+  @Override
+  protected void onResume(){
+    super.onResume();
+  }
 
   @Override
   public void onSensorChanged(SensorEvent sensorEvent) {
@@ -134,41 +163,4 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
   }
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_main);
-    Log.d("MainActivity", "onCreate");
-
-    SensorManager sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
-    Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-    sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-
-    final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-    stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-      @Override
-      public void onLayoutInflated(WatchViewStub stub) {
-        mTextView = (TextView) stub.findViewById(R.id.text);
-
-        RelativeLayout pic2 = (RelativeLayout) findViewById(R.id.pic2);
-        RelativeLayout pic1 = (RelativeLayout) findViewById(R.id.pic1);
-        WatchViewStub stub1 = (WatchViewStub)findViewById(R.id.watch_view_stub);
-
-        Log.d("onLayoutInflated", "width: " + stub1.getMeasuredWidth());
-        pic2.setX(stub1.getMeasuredWidth());
-
-        pic1.setOnClickListener(new UpListener());
-        pic2.setOnClickListener(new UpListener());
-
-        pic1.setOnLongClickListener(new DownListener());
-        pic2.setOnLongClickListener(new DownListener());
-
-      }
-    });
-  }
-
-  @Override
-  protected void onResume(){
-    super.onResume();
-  }
 }
