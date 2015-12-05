@@ -24,7 +24,7 @@ public class WearDataLayerListenerService extends WearableListenerService {
         // DataItem changed
         DataItem item = event.getDataItem();
         if (item.getUri().getPath().equals(SONG_PATH)) {
-          // Do we need the dataMap item? 
+          // Do we need the dataMap item?
           DataMap dataMap = DataMapItem.fromDataItem(item).getDataMap();
           Intent intent = new Intent(this, MainActivity.class);
           intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
