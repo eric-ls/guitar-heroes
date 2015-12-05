@@ -27,6 +27,8 @@ import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.Wearable;
 
+import com.guitarheroes.song.Song;
+
 public class MainActivity extends Activity implements SensorEventListener {
 
   private TextView mTextView;
@@ -154,7 +156,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         Log.d("onLayoutInflated", "width: " + stub1.getMeasuredWidth());
         pic2.setX(stub1.getMeasuredWidth());
-
 
         pic1.setOnClickListener(new UpListener());
         pic2.setOnClickListener(new UpListener());

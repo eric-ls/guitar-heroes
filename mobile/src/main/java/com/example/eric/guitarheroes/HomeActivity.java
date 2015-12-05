@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
+import com.guitarheroes.song.Song;
 
 public class HomeActivity extends AppCompatActivity {
 
