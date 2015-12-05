@@ -1,5 +1,6 @@
 package com.example.eric.guitarheroes;
 
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -27,10 +28,30 @@ import cz.msebera.android.httpclient.Header;
 
 public class HomeActivity extends AppCompatActivity {
 
+  GuitarPartyClient guitarParty = new GuitarPartyClient();
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.app_bar_home);
+
+    RequestParams params = new RequestParams();
+    params.add("query", "Jolene");
+    AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
+      @Override
+      public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+        try {
+          ArrayList<Song> songs = new ArrayList<>();
+          JSONArray objects = response.getJSONArray("objects");
+          for (int i = 0; i < objects.length(); i++) {
+            songs.add(new Song(objects.getJSONObject(i)));
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    };
+    guitarParty.get("songs/", params, handler);
 
     ImageView homeImage = (ImageView) findViewById(R.id.homeImage);
     homeImage.setOnClickListener(new View.OnClickListener() {

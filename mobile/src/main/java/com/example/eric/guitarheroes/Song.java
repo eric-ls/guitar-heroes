@@ -2,6 +2,8 @@ package com.example.eric.guitarheroes;
 
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 /**
@@ -17,38 +19,41 @@ public class Song {
     ArrayList<String> lyrics = new ArrayList<>();
     String title;
     String artist;
-    int difficulty;
 
-    public Song(String jsonString){
-        jsonString = jsonString.replace("\r\n", " ");
-        int indexOfOpenBracket = jsonString.indexOf('[');
-        int indexOfClosedBracket = jsonString.indexOf(']');
-        while(true){
-            if (indexOfOpenBracket != 0){
-                chords.add(" ");
-                lyrics.add(jsonString.substring(0, indexOfOpenBracket));
-                jsonString = jsonString.substring(indexOfOpenBracket);
-                indexOfOpenBracket = 0;
-                indexOfClosedBracket = jsonString.indexOf(']');
-            } else {
-                chords.add(jsonString.substring(1, indexOfClosedBracket));
-                jsonString = jsonString.substring(indexOfClosedBracket + 1);
-                indexOfOpenBracket = jsonString.indexOf('[');
-                if(indexOfOpenBracket == -1){
-                    break;
+    public Song(JSONObject songObj) {
+        try {
+            String jsonString = songObj.getString("body");
+            jsonString = jsonString.replace("\r\n", " ");
+            int indexOfOpenBracket = jsonString.indexOf('[');
+            int indexOfClosedBracket = jsonString.indexOf(']');
+            Log.d("Song", "Parsing song");
+            while(true){
+                if (indexOfOpenBracket != 0){
+                    chords.add(" ");
+                    lyrics.add(jsonString.substring(0, indexOfOpenBracket));
+                    jsonString = jsonString.substring(indexOfOpenBracket);
+                    indexOfOpenBracket = 0;
+                    indexOfClosedBracket = jsonString.indexOf(']');
+                } else {
+                    chords.add(jsonString.substring(1, indexOfClosedBracket));
+                    jsonString = jsonString.substring(indexOfClosedBracket + 1);
+                    indexOfOpenBracket = jsonString.indexOf('[');
+                    if(indexOfOpenBracket == -1){
+                        break;
+                    }
+                    lyrics.add(jsonString.substring(0, indexOfOpenBracket));
+                    jsonString = jsonString.substring(indexOfOpenBracket);
+                    indexOfOpenBracket = 0;
+                    indexOfClosedBracket = jsonString.indexOf(']');
                 }
-                lyrics.add(jsonString.substring(0, indexOfOpenBracket));
-                jsonString = jsonString.substring(indexOfOpenBracket);
-                indexOfOpenBracket = 0;
-                indexOfClosedBracket = jsonString.indexOf(']');
+                Log.d("Song", chords.get(chords.size() - 1) + " " + lyrics.get(lyrics.size() - 1));
+
+                title = songObj.getString("title");
+                artist = songObj.getJSONArray("authors").getJSONObject(0).getString("name");
             }
-            Log.d("Song", chords.get(chords.size() - 1) + " " + lyrics.get(lyrics.size() - 1));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public void setExtraInfo(int difficulty, String artist, String title){
-        this.difficulty = difficulty;
-        this.artist = artist;
-        this.title = title;
-    }
 }

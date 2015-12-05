@@ -70,7 +70,7 @@ public class SongActivity extends AppCompatActivity {
               PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
               PendingResult<DataApi.DataItemResult> pendingResult =
                       Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
-              Song song = new Song(response.getString("body"));
+              Song song = new Song(response);
             } catch (Exception e) {
               e.printStackTrace();
             }
