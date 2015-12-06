@@ -1,5 +1,6 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
@@ -14,27 +15,21 @@
         android:id="@+id/My_Container_2_ID"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/My_Container_1_ID" >
+        android:layout_weight="1">
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/My_Container_3_ID"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight = "1"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/My_Container_2_ID" >
+        android:layout_weight = "1" >
     </FrameLayout>
 
     <FrameLayout
         android:id="@+id/My_Container_4_ID"
         android:layout_width="fill_parent"
         android:layout_height="0dp"
-        android:layout_weight = "1"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/My_Container_3_ID" >
+        android:layout_weight = "1" >
     </FrameLayout>
 
-</RelativeLayout>
+</LinearLayout>
