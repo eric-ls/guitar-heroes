@@ -22,12 +22,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/home"
-        android:id="@+id/homeImage"/>
-
     <include layout="@layout/content_home"/>
 
 </android.support.design.widget.CoordinatorLayout>

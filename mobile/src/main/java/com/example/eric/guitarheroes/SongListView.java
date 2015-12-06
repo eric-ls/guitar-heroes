@@ -12,24 +12,31 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import com.guitarheroes.song.Song;
+
 /**
  * Created by Kevin on 12/5/2015.
  */
-public class FirstListView extends ListFragment{
-    ArrayList<Song> listOfRecentSongs = new ArrayList<>();
+public class SongListView extends ListFragment{
+    public SongAdapter adapter;
+    public ArrayList<Song> songList = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle onSavedInstanceState){
         super.onCreate(onSavedInstanceState);
-        SongAdapter adapter = new SongAdapter(listOfRecentSongs);
+        adapter = new SongAdapter(songList);
         setListAdapter(adapter);
-
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id){
         super.onListItemClick(l, v, position, id);
+    }
 
+    public void setSongList(ArrayList<Song> songs) {
+        adapter.clear();
+        adapter.addAll(songs);
+        adapter.notifyDataSetChanged();
     }
 
     private class SongAdapter extends ArrayAdapter<Song> {

@@ -1,14 +1,12 @@
 package com.example.eric.guitarheroes;
 
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
 
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -18,6 +16,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import android.widget.SearchView;
 
 import cz.msebera.android.httpclient.Header;
 import com.guitarheroes.song.Song;
@@ -29,10 +28,18 @@ public class HomeActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.app_bar_home);
+    setContentView(R.layout.content_home);
+    FragmentManager fragmentManager = getFragmentManager();
+    final Fragment topList = new SongListView();
+    fragmentManager.beginTransaction()
+            .add(R.id.My_Container_1_ID, topList)
+            .commit();
 
+    String defaultQuery = "love";
+    SearchView search = (SearchView) findViewById(R.id.song_search);
+    search.onActionViewExpanded();
     RequestParams params = new RequestParams();
-    params.add("query", "Jolene");
+    params.add("query", defaultQuery);
     AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
       @Override
       public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -42,21 +49,13 @@ public class HomeActivity extends AppCompatActivity {
           for (int i = 0; i < objects.length(); i++) {
             songs.add(new Song(objects.getJSONObject(i)));
           }
+          ((SongListView) topList).setSongList(songs);
         } catch (Exception e) {
           e.printStackTrace();
         }
       }
     };
     guitarParty.get("songs/", params, handler);
-
-    ImageView homeImage = (ImageView) findViewById(R.id.homeImage);
-    homeImage.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-        // open up the song activity
-        Intent intent = new Intent(getBaseContext(), SongListActivity.class);
-        startActivity(intent);
-      }
-    });
   }
 
   @Override

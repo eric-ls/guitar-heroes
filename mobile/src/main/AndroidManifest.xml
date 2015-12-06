@@ -20,7 +20,6 @@
         </activity>
         <activity android:name=".SongActivity">
         </activity>
-        <activity android:name=".SongListActivity"/>
     </application>
 
 </manifest>

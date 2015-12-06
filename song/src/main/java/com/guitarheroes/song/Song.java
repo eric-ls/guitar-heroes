@@ -17,8 +17,8 @@ import java.util.ArrayList;
 public class Song {
     ArrayList<String> chords = new ArrayList<>();
     ArrayList<String> lyrics = new ArrayList<>();
-    String title;
-    String artist;
+    public String title;
+    public String artist;
 
     public Song(JSONObject songObj) {
         try {
@@ -55,5 +55,4 @@ public class Song {
             e.printStackTrace();
         }
     }
-
 }
