@@ -1,6 +1,10 @@
 package com.example.eric.guitarheroes;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -9,7 +13,12 @@ import android.widget.ImageView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.NodeApi;
+import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
@@ -31,7 +40,7 @@ public class SongActivity extends AppCompatActivity {
   private static final String SONG_PATH = "/res/songs";
   private static final String JSON_SONG_KEY = "song data";
 
-  private GoogleApiClient mGoogleApiClient;
+  private static GoogleApiClient mGoogleApiClient;
   public static GuitarPartyClient guitarPartyClient = new GuitarPartyClient();
 
   @Override
@@ -61,7 +70,7 @@ public class SongActivity extends AppCompatActivity {
             .addApi(Wearable.API)
             .build();
 
-    // Which image is this? The whole image? Or just open on song button?
+      mGoogleApiClient.connect();
     ImageView image = (ImageView) findViewById(R.id.songImage);
     image.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -71,13 +80,17 @@ public class SongActivity extends AppCompatActivity {
           @Override
           public void onSuccess(int statusCode, Header[] headers, final JSONObject response) {
             try {
-
-              PutDataMapRequest putDataMapReq = PutDataMapRequest.create(SONG_PATH);
-              putDataMapReq.getDataMap().putString(JSON_SONG_KEY, response.toString());
-              PutDataRequest putDataReq = putDataMapReq.asPutDataRequest();
-              PendingResult<DataApi.DataItemResult> pendingResult =
-                      Wearable.DataApi.putDataItem(mGoogleApiClient, putDataReq);
               Song song = new Song(response);
+                Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
+                    @Override
+                    public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
+                        Log.d(TAG, Integer.toString(getConnectedNodesResult.getNodes().size()));
+                        for (Node node : getConnectedNodesResult.getNodes()) {
+                            Log.d(TAG, node.toString());
+                            sendWearableMessage(node.toString(), "");
+                        }
+                    }
+                });
             } catch (Exception e) {
               e.printStackTrace();
             }
@@ -87,4 +100,19 @@ public class SongActivity extends AppCompatActivity {
       }
     });
   }
+
+    private static void sendWearableMessage(String node, String data) {
+        try {
+            Wearable.MessageApi.sendMessage(mGoogleApiClient , node , SONG_PATH , data.getBytes("UTF-8")).setResultCallback(new ResultCallback<MessageApi.SendMessageResult>() {
+                @Override
+                public void onResult(MessageApi.SendMessageResult sendMessageResult) {
+                    if (!sendMessageResult.getStatus().isSuccess()) {
+                        Log.e("GoogleApi", "Failed to send message with status code: "
+                                + sendMessageResult.getStatus().getStatusCode());
+                    }
+                }
+            });
+        } catch (Exception e) {
+        }
+    }
 }

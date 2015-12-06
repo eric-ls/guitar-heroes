@@ -46,7 +46,7 @@ public class Song {
                     indexOfOpenBracket = 0;
                     indexOfClosedBracket = jsonString.indexOf(']');
                 }
-                Log.d("Song", chords.get(chords.size() - 1) + " " + lyrics.get(lyrics.size() - 1));
+                //Log.d("Song", chords.get(chords.size() - 1) + " " + lyrics.get(lyrics.size() - 1));
 
                 title = songObj.getString("title");
                 artist = songObj.getJSONArray("authors").getJSONObject(0).getString("name");

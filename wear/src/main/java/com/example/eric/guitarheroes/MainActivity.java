@@ -55,14 +55,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         pic1.setOnLongClickListener(new DownListener());
         pic2.setOnLongClickListener(new DownListener());
-
       }
     });
-  }
-
-  @Override
-  protected void onResume(){
-    super.onResume();
   }
 
   @Override
