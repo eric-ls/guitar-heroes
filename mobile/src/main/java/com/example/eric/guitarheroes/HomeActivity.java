@@ -29,7 +29,7 @@ public class HomeActivity extends AppCompatActivity {
 
   GuitarPartyClient guitarParty = new GuitarPartyClient();
   ITunesClient itunes = new ITunesClient();
-  private static final String TAG = SongActivity.class.getName();
+  private static final String TAG = HomeActivity.class.getName();
   final Fragment topList = new SongListView();
 
   @Override
