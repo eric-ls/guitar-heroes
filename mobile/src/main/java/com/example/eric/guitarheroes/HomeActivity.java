@@ -47,7 +47,7 @@ public class HomeActivity extends AppCompatActivity {
       public boolean onQueryTextSubmit(String query) {
         Log.d(TAG, "searching!");
         loadResults(((SearchView) search).getQuery().toString());
-        return true;
+        return false;
       }
       @Override
       public boolean onQueryTextChange(String query) {
