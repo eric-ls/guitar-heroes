@@ -8,7 +8,15 @@
         android:id="@+id/song_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:iconifiedByDefault="false"
         android:queryHint="Search for songs" />
+    <RelativeLayout
+        style="@style/GenericProgressBackground"
+        android:id="@+id/loadingPanel"
+        >
+        <ProgressBar
+            style="@style/GenericProgressIndicator"/>
+    </RelativeLayout>
     <FrameLayout
         android:id="@+id/My_Container_1_ID"
         android:layout_width="fill_parent"

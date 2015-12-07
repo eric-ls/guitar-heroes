@@ -19,6 +19,7 @@ public class Song {
     ArrayList<String> lyrics = new ArrayList<>();
     public String title;
     public String artist;
+    public String artUrl = "https://d30j0ipo6imng1.cloudfront.net/static/images/features/listen/album-placeholder.f97c23852f00.png";
 
     public Song(JSONObject songObj) {
         try {

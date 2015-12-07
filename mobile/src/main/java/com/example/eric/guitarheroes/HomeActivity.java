@@ -5,6 +5,7 @@ import android.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -16,6 +17,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import android.view.View;
+import android.widget.ListView;
 import android.widget.SearchView;
 
 import cz.msebera.android.httpclient.Header;
@@ -24,32 +28,68 @@ import com.guitarheroes.song.Song;
 public class HomeActivity extends AppCompatActivity {
 
   GuitarPartyClient guitarParty = new GuitarPartyClient();
+  ITunesClient itunes = new ITunesClient();
+  private static final String TAG = SongActivity.class.getName();
+  final Fragment topList = new SongListView();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.content_home);
     FragmentManager fragmentManager = getFragmentManager();
-    final Fragment topList = new SongListView();
     fragmentManager.beginTransaction()
             .add(R.id.My_Container_1_ID, topList)
             .commit();
+    loadResults("love");
+    final SearchView search = (SearchView) findViewById(R.id.song_search);
+    search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+      @Override
+      public boolean onQueryTextSubmit(String query) {
+        Log.d(TAG, "searching!");
+        loadResults(((SearchView) search).getQuery().toString());
+        return true;
+      }
+      @Override
+      public boolean onQueryTextChange(String query) {
+        return false;
+      }
+    });
+  }
 
-    String defaultQuery = "love";
-    SearchView search = (SearchView) findViewById(R.id.song_search);
-    search.onActionViewExpanded();
+  protected void loadResults(String query) {
+    findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
     RequestParams params = new RequestParams();
-    params.add("query", defaultQuery);
+    params.add("query", query);
     AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
       @Override
       public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
         try {
-          ArrayList<Song> songs = new ArrayList<>();
-          JSONArray objects = response.getJSONArray("objects");
+          final ArrayList<Song> songs = new ArrayList<>();
+          final JSONArray objects = response.getJSONArray("objects");
           for (int i = 0; i < objects.length(); i++) {
+            final int count = i;
             songs.add(new Song(objects.getJSONObject(i)));
+            final Song song = songs.get(i);
+            RequestParams params = new RequestParams();
+            params.add("term", songs.get(i).title);
+            params.add("limit", "1");
+            AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
+              @Override
+              public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                  song.artUrl = response.getJSONArray("results").getJSONObject(0).getString("artworkUrl100");
+                } catch (Exception e) {
+                  e.printStackTrace();
+                } finally {
+                  if (count == objects.length() - 1) {
+                    ((SongListView) topList).setSongList(songs);
+                    findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+                  }
+                }
+              }
+            };
+            itunes.get("search", params, handler);
           }
-          ((SongListView) topList).setSongList(songs);
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -76,7 +116,6 @@ public class HomeActivity extends AppCompatActivity {
     if (id == R.id.action_settings) {
       return true;
     }
-
     return super.onOptionsItemSelected(item);
   }
 }
