@@ -6,6 +6,7 @@ import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,7 +38,13 @@ public class HomeActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.content_home);
+    setContentView(R.layout.app_bar_home);
+
+    // setting toolbar title
+    Toolbar mActionToolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(mActionToolbar);
+    getSupportActionBar().setTitle("Guitar Heroes");
+
     FragmentManager fragmentManager = getFragmentManager();
     fragmentManager.beginTransaction()
             .add(R.id.My_Container_1_ID, topList)

@@ -2,20 +2,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_height="fill_parent"
+              android:paddingTop="60dp">
 
     <SearchView
         android:id="@+id/song_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:iconifiedByDefault="false"
-        android:queryHint="Search for songs" />
+        android:queryHint="Search for songs"
+        style="@style/Widget.AppCompat.SearchView.ActionBar"/>
     <RelativeLayout
-        style="@style/GenericProgressBackground"
         android:id="@+id/loadingPanel"
-        >
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/bright_foreground_material_dark">
         <ProgressBar
-            style="@style/GenericProgressIndicator"/>
+            style="@style/Base.Widget.AppCompat.ProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
     </RelativeLayout>
     <FrameLayout
         android:id="@+id/My_Container_1_ID"
