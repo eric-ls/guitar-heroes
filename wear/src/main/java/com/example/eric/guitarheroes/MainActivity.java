@@ -4,6 +4,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -32,6 +33,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    Intent intent = getIntent();
+    String songString = intent.getStringExtra("Song");
+    if (songString != null && songString != "") {
+      Song song = Song.fromJson(songString);
+      //TODO display song
+    }
+
     SensorManager sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
     Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
@@ -44,7 +52,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         RelativeLayout pic2 = (RelativeLayout) findViewById(R.id.pic2);
         RelativeLayout pic1 = (RelativeLayout) findViewById(R.id.pic1);
-        WatchViewStub stub1 = (WatchViewStub)findViewById(R.id.watch_view_stub);
+        WatchViewStub stub1 = (WatchViewStub) findViewById(R.id.watch_view_stub);
 
         Log.d("onLayoutInflated", "width: " + stub1.getMeasuredWidth());
         pic2.setX(stub1.getMeasuredWidth());

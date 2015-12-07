@@ -1,6 +1,7 @@
 package com.example.eric.guitarheroes;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
 
@@ -12,6 +13,7 @@ import com.google.android.gms.wearable.DataMapItem;
 import com.google.android.gms.wearable.MessageApi;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.WearableListenerService;
+import com.guitarheroes.song.Song;
 
 /**
  * Created by Yangzi on 12/5/15.
@@ -23,9 +25,6 @@ public class WearDataLayerListenerService extends WearableListenerService implem
   @Override
   public void onMessageReceived (MessageEvent messageEvent) {
     Log.d("GUITARS", "EVENT RECEIVED");
-    Intent intent = new Intent(this, MainActivity.class);
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    startActivity(intent);
     String text = "";
     try {
       text = new String(messageEvent.getData(), "UTF-8");
@@ -33,6 +32,9 @@ public class WearDataLayerListenerService extends WearableListenerService implem
     } catch (Exception e) {
       e.printStackTrace();
     }
+    Intent intent = new Intent(this, MainActivity.class);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    intent.putExtra("Song", text);
+    startActivity(intent);
   }
 }
-

@@ -72,14 +72,14 @@ public class SongListView extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, final int position, long id){
-        Log.d("guitar", songList.get(position).uri);
+        Log.d("guitar", songList.get(position).getUri());
         Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
             public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
                 Log.d(TAG, Integer.toString(getConnectedNodesResult.getNodes().size()));
                 for (Node node : getConnectedNodesResult.getNodes()) {
                     Log.d(TAG, node.toString());
-                    sendWearableMessage(node.toString(), songList.get(position).title);
+                    sendWearableMessage(node.toString(), songList.get(position).toJson());
                 }
             }
         });
@@ -121,13 +121,13 @@ public class SongListView extends ListFragment {
             TextView songTitle = (TextView) convertView.findViewById(R.id.song_title);
             TextView songArtist = (TextView) convertView.findViewById(R.id.song_artist);
             ImageView albumCover = (ImageView) convertView.findViewById(R.id.song_image);
-            if (images.containsKey(song.artUrl)) {
-                albumCover.setImageBitmap(images.get(song.artUrl));
+            if (images.containsKey(song.getArtUrl())) {
+                albumCover.setImageBitmap(images.get(song.getArtUrl()));
             } else {
-                new DownloadImageTask(albumCover).execute(song.artUrl);
+                new DownloadImageTask(albumCover).execute(song.getArtUrl());
             }
-            songTitle.setText(song.title);
-            songArtist.setText(song.artist);
+            songTitle.setText(song.getTitle());
+            songArtist.setText(song.getArtist());
 
             return convertView;
         }

@@ -2,6 +2,8 @@ package com.guitarheroes.song;
 
 import android.util.Log;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -15,12 +17,12 @@ import java.util.ArrayList;
  *
  */
 public class Song {
-    ArrayList<String> chords = new ArrayList<>();
-    ArrayList<String> lyrics = new ArrayList<>();
-    public String title;
-    public String artist;
-    public String uri;
-    public String artUrl = "https://d30j0ipo6imng1.cloudfront.net/static/images/features/listen/album-placeholder.f97c23852f00.png";
+    private ArrayList<String> chords = new ArrayList<>();
+    private ArrayList<String> lyrics = new ArrayList<>();
+    private String title;
+    private String artist;
+    private String uri;
+    private String artUrl = "https://d30j0ipo6imng1.cloudfront.net/static/images/features/listen/album-placeholder.f97c23852f00.png";
 
     public Song(JSONObject songObj) {
         try {
@@ -58,4 +60,65 @@ public class Song {
             e.printStackTrace();
         }
     }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public void setArtist(String artist) {
+        this.artist = artist;
+    }
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+    public void setArtUrl(String artUrl) {
+        this.artUrl = artUrl;
+    }
+    public void setChords(ArrayList<String> chords) {
+        this.chords = chords;
+    }
+    public void setLyrics(ArrayList<String> lyrics) {
+        this.lyrics = lyrics;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public String getArtist() {
+        return artist;
+    }
+    public String getUri() {
+        return uri;
+    }
+    public String getArtUrl() {
+        return artUrl;
+    }
+    public ArrayList<String> getChords() {
+        return chords;
+    }
+    public ArrayList<String> getLyrics() {
+        return lyrics;
+    }
+
+    public String toJson() {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String jsonInString = mapper.writeValueAsString(this);
+            Log.d("guitar", jsonInString);
+            return jsonInString;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "{}";
+    }
+
+    public static Song fromJson(String s) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            Song obj = mapper.readValue(s, Song.class);
+            return obj;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new Song(new JSONObject());
+    }
+
 }

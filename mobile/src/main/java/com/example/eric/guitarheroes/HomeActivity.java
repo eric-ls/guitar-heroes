@@ -2,6 +2,7 @@ package com.example.eric.guitarheroes;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import cz.msebera.android.httpclient.Header;
 import com.guitarheroes.song.Song;
@@ -60,24 +62,29 @@ public class HomeActivity extends AppCompatActivity {
     findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
     RequestParams params = new RequestParams();
     params.add("query", query);
+    final Context baseContext = this;
     AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
       @Override
       public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
         try {
           final ArrayList<Song> songs = new ArrayList<>();
           final JSONArray objects = response.getJSONArray("objects");
+          if (objects.length() == 0) {
+            findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+            Toast.makeText(baseContext, "No songs found!", Toast.LENGTH_LONG);
+          }
           for (int i = 0; i < objects.length(); i++) {
             final int count = i;
             songs.add(new Song(objects.getJSONObject(i)));
             final Song song = songs.get(i);
             RequestParams params = new RequestParams();
-            params.add("term", songs.get(i).title);
+            params.add("term", songs.get(i).getTitle());
             params.add("limit", "1");
             AsyncHttpResponseHandler handler = new JsonHttpResponseHandler() {
               @Override
               public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 try {
-                  song.artUrl = response.getJSONArray("results").getJSONObject(0).getString("artworkUrl100");
+                  song.setArtUrl(response.getJSONArray("results").getJSONObject(0).getString("artworkUrl100"));
                 } catch (Exception e) {
                   e.printStackTrace();
                 } finally {
