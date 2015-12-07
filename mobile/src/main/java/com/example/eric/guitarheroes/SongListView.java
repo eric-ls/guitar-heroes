@@ -36,7 +36,7 @@ public class SongListView extends ListFragment {
     public ArrayList<Song> songList = new ArrayList<>();
     private HashMap<String, Bitmap> images = new HashMap<>();
     private static GoogleApiClient mGoogleApiClient;
-    private static final String TAG = SongActivity.class.getName();
+    private static final String TAG = SongListView.class.getName();
     private static final String SONG_PATH = "/res/songs";
 
     @Override
