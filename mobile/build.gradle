@@ -27,4 +27,7 @@ dependencies {
     compile 'com.google.android.gms:play-services:8.3.0'
     compile 'com.android.support:design:23.1.1'
     compile 'com.loopj.android:android-async-http:1.4.9'
+    compile 'pl.tajchert:buswear:0.9.5'
+    compile 'com.google.android.gms:play-services-wearable:+'
+    compile project(':song')
 }
