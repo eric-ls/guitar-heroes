@@ -27,7 +27,7 @@ public class Song {
     public Song(JSONObject songObj) {
         try {
             String jsonString = songObj.getString("body");
-            jsonString = jsonString.replace("\r\n", " ");
+            jsonString = jsonString.replace("\r", " ").replace("\n", " ");
             int indexOfOpenBracket = jsonString.indexOf('[');
             int indexOfClosedBracket = jsonString.indexOf(']');
             Log.d("Song", "Parsing song");

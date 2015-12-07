@@ -32,7 +32,7 @@ public class WearDataLayerListenerService extends WearableListenerService implem
     } catch (Exception e) {
       e.printStackTrace();
     }
-    Intent intent = new Intent(this, MainActivity.class);
+    Intent intent = new Intent(this, BetterMainActivity.class);
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     intent.putExtra("Song", text);
     startActivity(intent);

@@ -27,7 +27,7 @@ public class MainActivity extends Activity implements SensorEventListener {
   double xVal = 0.0;
   double yVal = 0.0;
   double zVal = 0.0;
-
+  int index = 0;
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
