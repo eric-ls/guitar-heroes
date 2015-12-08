@@ -4,6 +4,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -23,10 +24,15 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Wearable;
 import com.guitarheroes.song.Song;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -39,6 +45,8 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
   final int majorTextSize = 30;
   final int minorTextSize = 22;
   final int chordSpacing = 20;
+
+  Song song;
 
   public boolean canMoveForward(){
     int rootChildCount = ((RelativeLayout)findViewById(R.id.root)).getChildCount();
@@ -53,6 +61,8 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
   }
 
   String getChordDisplayName(String chordName){
+    return chordName;
+    /*
     switch (chordName){
       case "a": return "A";
       case "am": return "Am";
@@ -77,10 +87,16 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
       case "g7": return "G7";
       default: return "";
     }
+    */
   }
 
   String getChordFileName(String chordName){
+    Log.d("getChordFileName", chordName);
+    chordName = chordName.substring(0, 1).toLowerCase() + chordName.substring(1);
+    Log.d("getChordFileName", "after conversion: " + chordName);
+
     return chordName;
+    //return chordName.toUpperCase();
     /*
     switch (chordName){
       case "a": return "a_chord";
@@ -329,8 +345,8 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
   }
 
   public void buildSong(Song song){
-    for(int i=0; i<song.lyrics.size(); i++){
-      addChord(song.chords.get(i), song.chords.get(i));
+    for(int i=0; i<song.getLyrics().size(); i++){
+      addChord(song.getChords().get(i), song.getLyrics().get(i));
     }
   }
 
@@ -340,26 +356,64 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
     setContentView(R.layout.activity_main);
     Log.d("MainActivity", "onCreatee");
 
+    Intent i = getIntent();
+
+    String songString = i.getStringExtra("Song");
+
+    if(songString != null){
+      Log.d("onCreate", "song string: " + songString);
+      self.song = Song.fromJson(songString);
+    }
+
+
+    /*
+    this.apiClient = new GoogleApiClient.Builder(this)
+            .addApi(Wearable.API)
+            .addConnectionCallbacks(this)
+            .addOnConnectionFailedListener(this)
+            .build();
+
+    this.apiClient.connect();
+
+    Wearable.MessageApi.addListener(this.apiClient, new MessageApi.MessageListener() {
+      @Override
+      public void onMessageReceived(MessageEvent messageEvent) {
+        Log.d(getClass().toString(), "Message received: " + messageEvent);
+        byte[] bytes = messageEvent.getData();
+
+        String str;
+        try {
+          str = new String(bytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+          str = "error";
+          e.printStackTrace();
+        }
+
+        Log.d(getClass().toString(), "Message is: " + str);
+      }
+    });
+    */
+
     final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
     stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
       @Override
       public void onLayoutInflated(WatchViewStub stub) {
-
+        /*
         ArrayList<HashMap<String, String>> song = new ArrayList<HashMap<String, String>>();
         HashMap<String, String> c1 = new HashMap<String, String>();
-        c1.put("chord", "a");
+        c1.put("chord", "c");
         c1.put("lyrics", "Slowly walking down the hall");
 
         HashMap<String, String> c2 = new HashMap<String, String>();
-        c2.put("chord", "a7");
+        c2.put("chord", "f");
         c2.put("lyrics", "Faster then a cannonball");
 
         HashMap<String, String> c3 = new HashMap<String, String>();
-        c3.put("chord", "a");
+        c3.put("chord", "g");
         c3.put("lyrics", "I'm a birthday candle in a circle of black girls");
 
         HashMap<String, String> c4 = new HashMap<String, String>();
-        c4.put("chord", "a7");
+        c4.put("chord", "am");
         c4.put("lyrics", "2 Loy dest de 2");
 
         song.add(c1);
@@ -368,6 +422,12 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
         song.add(c4);
 
         buildSong(song);
+        */
+
+        if(self.song != null){
+          buildSong(self.song);
+        }
+
 
         SensorManager sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         ShakeDetector shakeDetector = new ShakeDetector(self);
@@ -388,5 +448,39 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
     Log.d("hearShakeDown", "shakeDown");
     moveBackward();
   }
+
+  /*
+  @Override
+  public void onConnected(Bundle bundle) {
+    Log.d("onConnected", "watch connected");
+  }
+
+  @Override
+  public void onConnectionSuspended(int i) {
+
+  }
+
+  @Override
+  public void onMessageReceived (MessageEvent messageEvent) {
+    Log.d("onMessageReceived", "message received");
+
+    String text = "";
+    try {
+      text = new String(messageEvent.getData(), "UTF-8");
+
+      Song song = Song.fromJson(text);
+
+      buildSong(song);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void onConnectionFailed(ConnectionResult connectionResult) {
+
+  }
+  */
 }
 
