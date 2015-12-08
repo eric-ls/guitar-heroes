@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:iconifiedByDefault="false"
         android:queryHint="Search for songs"
-        style="@style/Widget.AppCompat.SearchView.ActionBar"/>
+        style="@android:style/TextAppearance.Material.Widget.Toolbar.Title"/>
     <RelativeLayout
         android:id="@+id/loadingPanel"
         android:layout_width="fill_parent"
