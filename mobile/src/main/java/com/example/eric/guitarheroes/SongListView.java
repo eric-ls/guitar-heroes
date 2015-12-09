@@ -1,10 +1,13 @@
 package com.example.eric.guitarheroes;
 
 import android.app.ListFragment;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -71,8 +74,21 @@ public class SongListView extends ListFragment {
     }
 
     @Override
-    public void onListItemClick(ListView l, View v, final int position, long id){
+    public void onListItemClick(ListView l, View v, final int position, long id) {
         Log.d("guitar", songList.get(position).getUri());
+        String title = songList.get(position).getTitle();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(title + " is loading on your watch. Flip around your watch to start jamming!")
+                .setTitle("Check your Android Wear Device")
+                .setIcon(R.drawable.watch)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) { }
+                });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
         Wearable.NodeApi.getConnectedNodes(mGoogleApiClient).setResultCallback(new ResultCallback<NodeApi.GetConnectedNodesResult>() {
             @Override
             public void onResult(NodeApi.GetConnectedNodesResult getConnectedNodesResult) {
@@ -120,6 +136,7 @@ public class SongListView extends ListFragment {
             Song song = getItem(position);
             TextView songTitle = (TextView) convertView.findViewById(R.id.song_title);
             TextView songArtist = (TextView) convertView.findViewById(R.id.song_artist);
+            TextView songDifficulty = (TextView) convertView.findViewById(R.id.song_difficulty);
             ImageView albumCover = (ImageView) convertView.findViewById(R.id.song_image);
             if (images.containsKey(song.getArtUrl())) {
                 albumCover.setImageBitmap(images.get(song.getArtUrl()));
@@ -128,6 +145,16 @@ public class SongListView extends ListFragment {
             }
             songTitle.setText(song.getTitle());
             songArtist.setText(song.getArtist());
+
+            char c = song.getTitle().charAt(1);
+
+            if (Character.getNumericValue(c) % 2 == 0) {
+                songDifficulty.setText("Intermediate");
+                songDifficulty.setTextColor(Color.parseColor("#FF9800"));
+            } else {
+                songDifficulty.setText("Beginner");
+                songDifficulty.setTextColor(Color.parseColor("#009688"));
+            }
 
             return convertView;
         }
