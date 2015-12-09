@@ -5,8 +5,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Detects phone shaking. If more than 75% of the samples taken in the past 0.5s are
@@ -21,9 +25,14 @@ public class ShakeDetector implements SensorEventListener {
   public static final int SENSITIVITY_LIGHT = 11;
   public static final int SENSITIVITY_MEDIUM = 13;
   public static final int SENSITIVITY_HARD = 15;
-
   private static final int DEFAULT_ACCELERATION_THRESHOLD = SENSITIVITY_MEDIUM;
 
+  private boolean isActive = true;
+
+  ArrayList<Float> restingSamples = new ArrayList<>();
+
+  Float restingValue;
+  final private int restingTestCount = 10;
   /**
    * When the magnitude of total acceleration exceeds this
    * value, the phone is accelerating.
@@ -82,42 +91,131 @@ public class ShakeDetector implements SensorEventListener {
     }
   }
 
+  public void pauseSelf(){
+    isActive = false;
+    new Timer().schedule(new TimerTask() {
+      @Override
+      public void run() {
+        Log.d("TimerTask", "running task, making active");
+        makeActive();
+      }
+    }, 500);
+  }
+
+  public void makeActive(){
+    isActive = true;
+  }
+
   @Override public void onSensorChanged(SensorEvent event) {
     int accelerating = isAccelerating(event);
     long timestamp = event.timestamp;
     queue.add(timestamp, accelerating);
+
+    if(!isActive){
+      Log.d("onSensorChanged", "NOT ACTIVE");
+      return;
+    }
+
     if (queue.isShakingDown()) {
+
       queue.clear();
       listener.hearDownShake();
+      pauseSelf();
     }
 
     if(queue.isShakingUp()){
       queue.clear();
       listener.hearUpShake();
+      pauseSelf();
     }
   }
 
   /** Returns true if the device is currently accelerating. */
   private int isAccelerating(SensorEvent event) {
+    if(!isActive){
+      return 0;
+    }
+
     float ax = event.values[0];
     float ay = event.values[1];
     float az = event.values[2];
 
+    float usefulAxis = ax;
+    //Log.d("isAccelerating", "x: " + ax + ", y" + ay + ", zz: " + az);
     // Instead of comparing magnitude to ACCELERATION_THRESHOLD,
     // compare their squares. This is equivalent and doesn't need the
     // actual magnitude, which would be computed using (expesive) Math.sqrt().
     //final double magnitudeSquared = ax * ax + ay * ay + az * az;
-    final double magnitudeSquared = az * az;
-    boolean isAccelerating = magnitudeSquared > (accelerationThreshold * accelerationThreshold)/3;
+    restingSamples.add(usefulAxis);
+    if(restingSamples.size() > restingTestCount){
+      restingSamples.remove(0);
+    }
+
+    Float test_rest = isResting();
+
+    if(test_rest != null){
+      restingValue = test_rest;
+    }
+
+
+    //restingValue = isResting();
+
+    //Log.d("isAccelerating", "restingValue: " + restingValue + ", x: " + usefulAxis);
+
+    if(restingValue == null){
+      return 0;
+    }
+
+    final double magnitudeSquared = (usefulAxis - restingValue) * (usefulAxis - restingValue);
+
+    double threshold = (accelerationThreshold * accelerationThreshold)/30;
+
+    Log.d("isAccelerating", "mag: " + magnitudeSquared + ", thres: " + threshold);
+
+    //Log.d("isAccelerating", "mag: " + magnitudeSquared + ", threshold: " + threshold);
+    boolean isAccelerating = magnitudeSquared > threshold;
     if(!isAccelerating){
       return 0;
-    } else if(az > 0){
+    } else if(usefulAxis > 0){
       return 1;
     } else {
       return -1;
     }
 
     //return magnitudeSquared > accelerationThreshold * accelerationThreshold;
+  }
+
+  public Float isResting(){
+    //Log.d("isResting", "restingSamples size: " + restingSamples.size());
+    if(restingSamples.size() < restingTestCount){
+      return null;
+    }
+
+    Float startingPoint = restingSamples.get(0);
+    boolean isResting = true;
+    float total = startingPoint;
+    for(int i=1; i<restingSamples.size(); i++){
+      Float thisSample = restingSamples.get(i);
+
+      float diff = Math.abs(thisSample - startingPoint);
+
+      //Log.d("isResting", "starting: " + startingPoint + ", thisSample: " + thisSample);
+      if(diff > 0.5){
+        isResting = false;
+        //Log.d("isResting", "setting false");
+        break;
+      } else {
+        total += thisSample;
+      }
+    }
+
+    if(isResting){
+      float restVal = total/(float)restingTestCount;
+      //Log.d("isResting", "returning: " + restVal);
+      return restVal;
+    } else {
+      return null;
+    }
   }
 
   /** Sets the acceleration threshold sensitivity. */
@@ -231,6 +329,7 @@ public class ShakeDetector implements SensorEventListener {
      * are accelerating.
      */
     boolean isShakingUp() {
+
       return newest != null
           && oldest != null
           && newest.timestamp - oldest.timestamp >= MIN_WINDOW_SIZE
@@ -238,6 +337,7 @@ public class ShakeDetector implements SensorEventListener {
     }
 
     boolean isShakingDown(){
+
       return newest != null
               && oldest != null
               && newest.timestamp - oldest.timestamp >= MIN_WINDOW_SIZE
