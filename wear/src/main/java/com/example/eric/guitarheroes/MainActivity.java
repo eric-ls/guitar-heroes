@@ -1,5 +1,6 @@
 package com.example.eric.guitarheroes;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
@@ -14,6 +15,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.util.Log;
@@ -33,6 +35,7 @@ import com.google.android.gms.wearable.Wearable;
 import com.guitarheroes.song.Song;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -44,7 +47,6 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
   final int animationSpeed = 500;
   final int majorTextSize = 30;
   final int minorTextSize = 22;
-  final int chordSpacing = 20;
 
   Song song;
 
@@ -62,32 +64,6 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
 
   String getChordDisplayName(String chordName){
     return chordName;
-    /*
-    switch (chordName){
-      case "a": return "A";
-      case "am": return "Am";
-      case "a7": return "A7";
-      case "b": return "B";
-      case "bm": return "Bm";
-      case "b7": return "B7";
-      case "c": return "C";
-      case "cm": return "Cm";
-      case "c7": return "C7";
-      case "d": return "D";
-      case "dm": return "Dm";
-      case "d7": return "D7";
-      case "e": return "E";
-      case "em": return "Em";
-      case "e7": return "E7";
-      case "f": return "F";
-      case "fm": return "Fm";
-      case "f7": return "F7";
-      case "g": return "G";
-      case "gm": return "Gm";
-      case "g7": return "G7";
-      default: return "";
-    }
-    */
   }
 
   String getChordFileName(String chordName){
@@ -96,33 +72,7 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
     Log.d("getChordFileName", "after conversion: " + chordName);
 
     return chordName;
-    //return chordName.toUpperCase();
-    /*
-    switch (chordName){
-      case "a": return "a_chord";
-      case "am": return "am_chord";
-      case "a7": return "a7_chord";
-      case "b": return "b_chord";
-      case "bm": return "bm_chord";
-      case "b7": return "b7_chord";
-      case "c": return "c_chord";
-      case "cm": return "cm_chord";
-      case "c7": return "c7_chord";
-      case "d": return "d_chord";
-      case "dm": return "dm_chord";
-      case "d7": return "d7_chord";
-      case "e": return "e_chord";
-      case "em": return "em_chord";
-      case "e7": return "e7_chord";
-      case "f": return "f_chord";
-      case "fm": return "fm_chord";
-      case "f7": return "f7_chord";
-      case "g": return "g_chord";
-      case "gm": return "gm_chord";
-      case "g7": return "g7_chord";
-      default: return "";
-    }
-    */
+
   }
   public boolean moveForward(){
     Log.d(getClass().toString(), "moveForward");
@@ -149,6 +99,10 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
     return true;
   }
 
+  public void removeChordImage(){
+
+  }
+
   public void move(int direction) {
     RelativeLayout rl = (RelativeLayout) findViewById(R.id.root);
     RelativeLayout chordList = (RelativeLayout)findViewById(R.id.chord_list);
@@ -157,11 +111,19 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
     AnimatorSet as = new AnimatorSet();
     AnimatorSet.Builder asBuilder = null;
 
+
     for (int i = 0; i < rl.getChildCount(); i++) {
-      RelativeLayout thisChord = (RelativeLayout) rl.getChildAt(i);
+      final RelativeLayout thisChord = (RelativeLayout) rl.getChildAt(i);
       ObjectAnimator animator = ObjectAnimator.ofFloat(thisChord, "x", thisChord.getX() + (thisChord.getWidth() * direction));
 
+
       TextView tv = (TextView)chordList.getChildAt(i);
+      final String chordTitle = (String)tv.getText();
+      /*
+      if(chordImage != null){
+        chordImage.setImageResource(getResources().getIdentifier(getChordFileName((String)tv.getText()), "drawable", getPackageName()));
+      }
+      */
 
       if (asBuilder == null) {
         asBuilder = as.play(animator);
@@ -173,6 +135,8 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
         if(direction == 1){
           ObjectAnimator chordAnim = ObjectAnimator.ofFloat(tv, "x", thisChord.getWidth()/3 - (getTextPixels((String)tv.getText(), minorTextSize).width()/2));
           asBuilder.with(chordAnim);
+
+
         }
       } else if(i == onScreen-1){
         if(direction == 1){
@@ -183,9 +147,22 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
           asBuilder.with(chordAnim2);
           asBuilder.with(chordAnim3);
           asBuilder.with(chordAnim);
+
+          ImageView chordImage = null;
+
+          for(int j=0; j<thisChord.getChildCount(); j++){
+            if(thisChord.getChildAt(j).getClass().equals(ImageView.class)){
+              chordImage = (ImageView)thisChord.getChildAt(j);
+              break;
+            }
+          }
+
+          chordImage.setImageResource(getResources().getIdentifier(getChordFileName(chordTitle), "drawable", getPackageName()));
+          //chordImage.setImageDrawable(null);
         } else {
           ObjectAnimator chordAnim = ObjectAnimator.ofFloat(tv, "x",  -getTextPixels((String)tv.getText(), majorTextSize).width());
           asBuilder.with(chordAnim);
+
         }
       } else if(i == onScreen){
         if(direction == 1){
@@ -195,6 +172,39 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
           asBuilder.with(chordAnim2);
           asBuilder.with(chordAnim3);
           asBuilder.with(chordAnim);
+
+          animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+              ImageView chordImage = null;
+
+              for (int j = 0; j < thisChord.getChildCount(); j++) {
+                if (thisChord.getChildAt(j).getClass().equals(ImageView.class)) {
+                  chordImage = (ImageView) thisChord.getChildAt(j);
+                  break;
+                }
+              }
+
+              //chordImage.setImageResource(getResources().getIdentifier(getChordFileName(chordTitle), "drawable", getPackageName()));
+              chordImage.setImageDrawable(null);
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+          });
         } else {
           ObjectAnimator chordAnim = ObjectAnimator.ofFloat(tv, "x", thisChord.getWidth()/3 - (getTextPixels((String)tv.getText(), minorTextSize).width()/2));
           ObjectAnimator chordAnim2 = ObjectAnimator.ofFloat(tv, "textSize", majorTextSize, minorTextSize);
@@ -203,6 +213,39 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
           asBuilder.with(chordAnim);
           asBuilder.with(chordAnim2);
           asBuilder.with(chordAnim3);
+
+          animator.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+              ImageView chordImage = null;
+
+              for (int j = 0; j < thisChord.getChildCount(); j++) {
+                if (thisChord.getChildAt(j).getClass().equals(ImageView.class)) {
+                  chordImage = (ImageView) thisChord.getChildAt(j);
+                  break;
+                }
+              }
+
+              //chordImage.setImageResource(getResources().getIdentifier(getChordFileName(chordTitle), "drawable", getPackageName()));
+              chordImage.setImageDrawable(null);
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+          });
         }
       } else if(i == onScreen + 1){
         if(direction == 1){
@@ -216,6 +259,19 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
           asBuilder.with(chordAnim);
           asBuilder.with(chordAnim2);
           asBuilder.with(chordAnim3);
+
+          ImageView chordImage = null;
+
+          for(int j=0; j<thisChord.getChildCount(); j++){
+            if(thisChord.getChildAt(j).getClass().equals(ImageView.class)){
+              chordImage = (ImageView)thisChord.getChildAt(j);
+              break;
+            }
+          }
+
+          chordImage.setImageResource(getResources().getIdentifier(getChordFileName(chordTitle), "drawable", getPackageName()));
+          //chordImage.setImageDrawable(null);
+
         }
       } else if(i == onScreen + 2){
         if(direction == -1){
@@ -287,12 +343,19 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
     RelativeLayout.LayoutParams ivParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
     iv.setLayoutParams(ivParams);
 
-    iv.setImageResource(getResources().getIdentifier(getChordFileName(chordName), "drawable", getPackageName()));
+    if(root.getChildCount() == 0){
+      iv.setImageResource(getResources().getIdentifier(getChordFileName(chordName), "drawable", getPackageName()));
+    }
+
     iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
     newChord.addView(iv);
 
     TextView lyricsTV = new TextView(self);
+    if(lyrics.length() > 50){
+      lyrics = lyrics.substring(0, 50);
+    }
+
     lyricsTV.setText(lyrics);
     lyricsTV.setTextSize(14);
     lyricsTV.setTextColor(Color.WHITE);
@@ -365,63 +428,26 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
       self.song = Song.fromJson(songString);
     }
 
-
-    /*
-    this.apiClient = new GoogleApiClient.Builder(this)
-            .addApi(Wearable.API)
-            .addConnectionCallbacks(this)
-            .addOnConnectionFailedListener(this)
-            .build();
-
-    this.apiClient.connect();
-
-    Wearable.MessageApi.addListener(this.apiClient, new MessageApi.MessageListener() {
-      @Override
-      public void onMessageReceived(MessageEvent messageEvent) {
-        Log.d(getClass().toString(), "Message received: " + messageEvent);
-        byte[] bytes = messageEvent.getData();
-
-        String str;
-        try {
-          str = new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-          str = "error";
-          e.printStackTrace();
-        }
-
-        Log.d(getClass().toString(), "Message is: " + str);
-      }
-    });
-    */
-
     final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
     stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
       @Override
       public void onLayoutInflated(WatchViewStub stub) {
         /*
-        ArrayList<HashMap<String, String>> song = new ArrayList<HashMap<String, String>>();
-        HashMap<String, String> c1 = new HashMap<String, String>();
-        c1.put("chord", "c");
-        c1.put("lyrics", "Slowly walking down the hall");
+        self.song = new Song();
+        ArrayList<String> chords = new ArrayList<String>();
+        chords.add("a");
+        chords.add("c");
+        chords.add("a");
+        chords.add("c");
 
-        HashMap<String, String> c2 = new HashMap<String, String>();
-        c2.put("chord", "f");
-        c2.put("lyrics", "Faster then a cannonball");
+        ArrayList<String> lyrics = new ArrayList<String>();
+        lyrics.add("Hey Jude");
+        lyrics.add("don't make it bad");
+        lyrics.add("take a sad song");
+        lyrics.add("and make it better");
 
-        HashMap<String, String> c3 = new HashMap<String, String>();
-        c3.put("chord", "g");
-        c3.put("lyrics", "I'm a birthday candle in a circle of black girls");
-
-        HashMap<String, String> c4 = new HashMap<String, String>();
-        c4.put("chord", "am");
-        c4.put("lyrics", "2 Loy dest de 2");
-
-        song.add(c1);
-        song.add(c2);
-        song.add(c3);
-        song.add(c4);
-
-        buildSong(song);
+        self.song.setChords(chords);
+        self.song.setLyrics(lyrics);
         */
 
         if(self.song != null){
@@ -445,42 +471,8 @@ public class MainActivity extends Activity implements ShakeDetector.Listener {
 
   @Override
   public void hearDownShake() {
-    Log.d("hearShakeDown", "shakeDown");
+    Log.d("hearShakeDown", "shakeDownn");
     moveBackward();
   }
-
-  /*
-  @Override
-  public void onConnected(Bundle bundle) {
-    Log.d("onConnected", "watch connected");
-  }
-
-  @Override
-  public void onConnectionSuspended(int i) {
-
-  }
-
-  @Override
-  public void onMessageReceived (MessageEvent messageEvent) {
-    Log.d("onMessageReceived", "message received");
-
-    String text = "";
-    try {
-      text = new String(messageEvent.getData(), "UTF-8");
-
-      Song song = Song.fromJson(text);
-
-      buildSong(song);
-
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  @Override
-  public void onConnectionFailed(ConnectionResult connectionResult) {
-
-  }
-  */
 }
 

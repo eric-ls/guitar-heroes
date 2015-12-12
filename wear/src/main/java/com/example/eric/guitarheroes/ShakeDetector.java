@@ -200,7 +200,7 @@ public class ShakeDetector implements SensorEventListener {
       float diff = Math.abs(thisSample - startingPoint);
 
       //Log.d("isResting", "starting: " + startingPoint + ", thisSample: " + thisSample);
-      if(diff > 0.5){
+      if(diff > 0.35){
         isResting = false;
         //Log.d("isResting", "setting false");
         break;
